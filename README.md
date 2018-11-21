@@ -1,2 +1,2 @@
-# time-for-BED
+# comfy-BED
 Code to produce BED files from LRG files.
