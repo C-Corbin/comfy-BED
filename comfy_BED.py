@@ -1,6 +1,7 @@
 import argparse
 import textwrap
 import os
+import csv
 import xml.etree.ElementTree as ET
 
 
@@ -101,6 +102,13 @@ def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_strand)
     return list_of_exons
 
 
+def writeToFile(data_list, file_name):
+    with open(file_name, 'wb') as out:
+        writer = csv.writer(out, delimiter='\t')
+        for row in data_list:
+            writer.writerow(row)
+
+
 def main():
     args = getArgs()
     assert os.path.isfile(args.input_LRG), 'The input is not a file.'
@@ -125,6 +133,9 @@ def main():
             transcript_dict = getLrgExons(transcript, lrg_id)
             exon_genomic_positions = calculateGenomicPositions(chr, transcript_dict, genome_start, genome_strand)
 
+            # write out
+            file_name = '{}.bed'.format(lrg_id)
+            writeToFile(exon_genomic_positions, file_name)
 
 
     # calculate genomic coordinates, depending on stand orientation
