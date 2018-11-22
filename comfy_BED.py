@@ -84,25 +84,33 @@ def getGenomeMapping(root, genome_build):
     return(chr, start, end, strand)
 
 
-def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_strand):
+def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_end, genome_strand):
     '''
     add the genome_start number to the LRG exon boundaries, to convert them
     to genomic exon boundaries
     '''
     list_of_exons = []
-    if genome_strand == '1':
-        for item in transcript_dict.iteritems():
-            exon_label = str(item[0])
-            lrg_start = int(item[1][0])
-            lrg_end = int(item[1][1])
+    for item in transcript_dict.iteritems():
+        exon_label = str(item[0])
+        lrg_start = int(item[1][0])
+        lrg_end = int(item[1][1])
+        if genome_strand == '1':
             gen_exon_start = genome_start + lrg_start
             gen_exon_end = genome_start + lrg_end
             list_of_exons.append((chr, gen_exon_start, gen_exon_end, exon_label))
-    #else
+        elif genome_strand == '-1':
+            gen_exon_start = genome_end
+            gen_exon_end = genome_end
+            list_of_exons.append((chr, gen_exon_start, gen_exon_end, exon_label))
+        else:
+            print('Cannot determine strand')
     return list_of_exons
 
 
 def writeToFile(data_list, file_name):
+    '''
+    Take a list of tuples and look through and write as a tab seperated file
+    '''
     with open(file_name, 'wb') as out:
         writer = csv.writer(out, delimiter='\t')
         for row in data_list:
@@ -128,22 +136,17 @@ def main():
     chr, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
 
     # extract the exon boundries - lrg numbering - make into python dict
+    # calculate genomic coordinates, depending on strand orientation
     for transcript in root.iter('transcript'):
-        if str(transcript.get('name')) in args.transcripts:
+        transcript_name = str(transcript.get('name'))
+        if transcript_name in args.transcripts:
             transcript_dict = getLrgExons(transcript, lrg_id)
-            exon_genomic_positions = calculateGenomicPositions(chr, transcript_dict, genome_start, genome_strand)
+            exon_genomic_positions = calculateGenomicPositions(chr, transcript_dict, genome_start, genome_end, genome_strand)
 
-            # write out
-            file_name = '{}.bed'.format(lrg_id)
+            # output in tab delimted text file
+            #TODO add header, option to change filename, sorting
+            file_name = '{}_{}.bed'.format(lrg_id, transcript_name)
             writeToFile(exon_genomic_positions, file_name)
-
-
-    # calculate genomic coordinates, depending on stand orientation
-
-        # get strand: 1 or -1
-        # add 5000 for 5' or 2000 for 3'
-        # add/subtract overall genomic coords to exon numbers (depending on strand)
-    # output in tab delimted text file - chr, start, end, exon_no (.bed)
 
 
 if __name__ == '__main__':
