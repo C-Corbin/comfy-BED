@@ -35,6 +35,16 @@ def getArgs():
         '''
     ))
 
+    # genome build options
+    parser.add_argument(
+        '-g', '--genome_build', action='store', 
+        choices=['GRCh37', 'GRCh38'], default='GRCh37',
+        help=textwrap.dedent(
+        '''
+        Select genome build from 'GRCh37' or 'GRCh38'. Defaults to GRCh37.
+        '''
+    ))
+
     return parser.parse_args()
 
 
@@ -55,7 +65,7 @@ def getLrgExons(transcript, lrg_id):
     return(transcript_dict)
 
 
-def getGenomeMapping(root, genome_build='GRCh37'):
+def getGenomeMapping(root, genome_build):
     '''
     Parses chromosome number, strand direction and LRG start and end 
     postions on the genome build (default GCRh37). The start and end
@@ -89,7 +99,7 @@ def main():
         lrg_id = levels.find('id').text
 
     # extract chr, start, end, strand from mapping region of xml
-    chr, genome_start, genome_end, genome_strand = getGenomeMapping(root)
+    chr, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
 
     # extract the exon boundries - lrg numbering - make into python dict
     for transcript in root.iter('transcript'):
