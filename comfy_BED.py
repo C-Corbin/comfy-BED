@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 
 # load arguments
-def get_args():
+def getArgs():
     """
     Use argparse package to take arguments from the command line. 
     See descriptions for full detail of each argument.
@@ -37,6 +37,7 @@ def get_args():
 
     return parser.parse_args()
 
+
 def getLrgExons(transcript, lrg_id):
     '''
     Make a dictionary (key is string exon label, value is tuple of 'start' and 'end' 
@@ -54,8 +55,26 @@ def getLrgExons(transcript, lrg_id):
     return(transcript_dict)
 
 
+def getGenomeMapping(root, genome_build='GRCh37'):
+    '''
+    Parses chromosome number, strand direction and LRG start and end 
+    postions on the genome build (default GCRh37). The start and end
+    positions will be used to convert between LRG numbering and 
+    genome numbering.
+    '''
+    for mapping in root.iter('mapping'):
+        if str(mapping.get('coord_system')).startswith(genome_build):
+            chr = 'chr{}'.format(mapping.get('other_name'))
+
+            for m_span in mapping.iter('mapping_span'):
+                start = int(m_span.get('other_start'))
+                end = int(m_span.get('other_end'))
+                strand = str(m_span.get('strand'))
+    return(chr, start, end, strand)
+
+
 def main():
-    args = get_args()
+    args = getArgs()
     assert os.path.isfile(args.input_LRG), 'The input is not a file.'
     assert args.input_LRG.endswith('.xml'), 'The input file is not an xml file.'
 
@@ -64,15 +83,21 @@ def main():
     tree = ET.parse(os.path.abspath(args.input_LRG))
     root = tree.getroot()
     assert root.tag.upper() == "LRG", 'The input file is not an LRG file'
+
+    # get lrg id
     for levels in root.iter('fixed_annotation'):
         lrg_id = levels.find('id').text
+
+    # extract chr, start, end, strand from mapping region of xml
+    chr, genome_start, genome_end, genome_strand = getGenomeMapping(root)
+
     # extract the exon boundries - lrg numbering - make into python dict
     for transcript in root.iter('transcript'):
         if str(transcript.get('name')) in args.transcripts:
             transcript_dict = getLrgExons(transcript, lrg_id)
             print(transcript_dict)
 
-    # extract chr, start, end, strand from mapping region of xml
+
     # calculate genomic coordinates, depending on stand orientation
         # get strand: 1 or -1
         # add 5000 for 5' or 2000 for 3'
