@@ -83,6 +83,24 @@ def getGenomeMapping(root, genome_build):
     return(chr, start, end, strand)
 
 
+def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_strand):
+    '''
+    add the genome_start number to the LRG exon boundaries, to convert them
+    to genomic exon boundaries
+    '''
+    list_of_exons = []
+    if genome_strand == '1':
+        for item in transcript_dict.iteritems():
+            exon_label = str(item[0])
+            lrg_start = int(item[1][0])
+            lrg_end = int(item[1][1])
+            gen_exon_start = genome_start + lrg_start
+            gen_exon_end = genome_start + lrg_end
+            list_of_exons.append((chr, gen_exon_start, gen_exon_end, exon_label))
+    #else
+    return list_of_exons
+
+
 def main():
     args = getArgs()
     assert os.path.isfile(args.input_LRG), 'The input is not a file.'
@@ -105,10 +123,12 @@ def main():
     for transcript in root.iter('transcript'):
         if str(transcript.get('name')) in args.transcripts:
             transcript_dict = getLrgExons(transcript, lrg_id)
-            print(transcript_dict)
+            exon_genomic_positions = calculateGenomicPositions(chr, transcript_dict, genome_start, genome_strand)
+
 
 
     # calculate genomic coordinates, depending on stand orientation
+
         # get strand: 1 or -1
         # add 5000 for 5' or 2000 for 3'
         # add/subtract overall genomic coords to exon numbers (depending on strand)
