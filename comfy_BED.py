@@ -3,6 +3,7 @@ import textwrap
 import os
 import csv
 import xml.etree.ElementTree as ET
+import datetime
 
 
 # load arguments
@@ -109,11 +110,12 @@ def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_end, ge
     return list_of_exons
 
 
-def writeToFile(data_list, file_name):
+def writeToFile(data_list, file_name, now):
     '''
     Take a list of tuples and look through and write as a tab seperated file
     '''
     with open(file_name, 'wb') as out:
+        out.writelines('#BED file generated at: ' + now.strftime("%Y-%m-%d %H:%M") + '\n')
         writer = csv.writer(out, delimiter='\t')
         for row in data_list:
             writer.writerow(row)
@@ -121,6 +123,7 @@ def writeToFile(data_list, file_name):
 
 def main():
     args = getArgs()
+    now = datetime.datetime.now()
     assert os.path.isfile(args.input_LRG), 'The input is not a file.'
     assert args.input_LRG.endswith('.xml'), 'The input file is not an xml file.'
 
@@ -148,7 +151,7 @@ def main():
             # output in tab delimted text file
             #TODO add header, option to change filename, sorting
             file_name = '{}_{}.bed'.format(lrg_id, transcript_name)
-            writeToFile(exon_genomic_positions, file_name)
+            writeToFile(exon_genomic_positions, file_name, now)
 
 
 if __name__ == '__main__':
