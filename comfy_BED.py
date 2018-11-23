@@ -95,13 +95,15 @@ def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_end, ge
         lrg_start = int(item[1][0])
         lrg_end = int(item[1][1])
         if genome_strand == '1':
-            gen_exon_start = genome_start + lrg_start
-            gen_exon_end = genome_start + lrg_end
+            gen_exon_start = genome_start + lrg_start -1
+            gen_exon_end = genome_start + lrg_end -1
             list_of_exons.append((chr, gen_exon_start, gen_exon_end, exon_label))
         elif genome_strand == '-1':
-            gen_exon_start = genome_end
-            gen_exon_end = genome_end
-            list_of_exons.append((chr, gen_exon_start, gen_exon_end, exon_label))
+            exon_length = lrg_end - lrg_start
+            gen_exon_end = genome_end - lrg_end + 1
+            gen_exon_start = gen_exon_end + exon_length
+            # start and end are switch round because bed files should have the smallest value first
+            list_of_exons.append((chr, gen_exon_end, gen_exon_start, exon_label))
         else:
             print('Cannot determine strand')
     return list_of_exons
