@@ -1,0 +1,4 @@
+name: comfy-env
+dependencies:
+- python=2.7
+- pytest=3.3.2
