@@ -106,7 +106,7 @@ def calculateGenomicPositions(transcript_dict, chrom, genome_start, genome_end, 
             # start and end are switch round because bed files should have the smallest value first
             list_of_exons.append((chrom, gen_exon_end, gen_exon_start, exon_label))
         else:
-            print('Cannot determine strand')
+            raise ValueError('Cannot determine strand')
     return list_of_exons
 
 

@@ -44,27 +44,25 @@ def test_getGenomeMapping():
 
 
 def test_calculateGenomicPositions():
-    # Define transcript dicts
-    # LRG_5 t1
+    # Setup - define transcript dicts
+    # LRG_5 - three transcripts
     dict_LRG_5_t1 = {'exon_13': (24287, 24362), 'exon_12': (23768, 23885), 'exon_11': (21749, 21899), 'exon_10': (19716, 19811), 
                      'exon_15': (25233, 25750), 'exon_14a': (24673, 24813), 'exon_9': (19421, 19548), 'exon_8': (17095, 17216), 
                      'exon_3': (12695, 12884), 'exon_2': (9610, 9762), 'exon_1': (5001, 5578), 'exon_7': (16868, 16920), 
                      'exon_6': (16448, 16537), 'exon_5': (14163, 14302), 'exon_4': (13102, 13233)}
-    # LRG_5 t2
     dict_LRG_5_t2 = {'exon_13': (24287, 24362), 'exon_12': (23768, 23885), 'exon_11': (21749, 21899), 'exon_10': (19716, 19811), 
                      'exon_15': (25233, 25750), 'exon_14b': (24673, 24832), 'exon_9': (19421, 19548), 'exon_8': (17095, 17216), 
                      'exon_3': (12695, 12884), 'exon_2': (9610, 9762), 'exon_1': (5001, 5578), 'exon_7': (16868, 16920), 
                      'exon_6': (16448, 16537), 'exon_5': (14163, 14302), 'exon_4': (13102, 13233)}
-    # LRG_5 t3
     dict_LRG_5_t3 = {'exon_13': (24287, 24362), 'exon_12': (23768, 23885), 'exon_11': (21749, 21899), 'exon_10': (19716, 19811), 
                      'exon_14c': (24673, 25750), 'exon_9': (19421, 19548), 'exon_8': (17095, 17216), 'exon_3': (12695, 12884), 
                      'exon_2': (9610, 9762), 'exon_1': (5001, 5578), 'exon_7': (16868, 16920), 'exon_6': (16448, 16537), 
                      'exon_5': (14163, 14302), 'exon_4': (13102, 13233)}
 
-    # LRG_9 t1
+    # LRG_9 - one transcript
     dict_LRG_9_t1 = {'exon_3': (7021, 7165), 'exon_2': (6011, 6127), 'exon_1': (4978, 5113), 'exon_4': (12959, 13955)}
 
-    # LRG_293 t1
+    # LRG_293 - one transcript
     dict_LRG_293_t1 = {'exon_22': (68838, 69036), 'exon_23': (69271, 69434), 'exon_20': (60477, 60621), 'exon_21': (66191, 66312), 
                        'exon_26': (86419, 86565), 'exon_27': (87683, 89193), 'exon_24': (69528, 69666), 'exon_25': (84210, 84454), 
                        'exon_13': (36348, 36417), 'exon_12': (34079, 34174), 'exon_11': (25786, 30717), 'exon_10': (21793, 22908), 
@@ -74,7 +72,8 @@ def test_calculateGenomicPositions():
                        'exon_6': (15763, 15803), 'exon_5': (15622, 15671), 'exon_4': (14597, 14705)}
 
 
-    # test calculateGenomicPositions - input is chr, transcript_dict, gen_start, gen_end, gen_strand
+    # Test calculateGenomicPositions produces the correct output - a list of tuples
+    # input is transcript_dict, chrom, gen_start, gen_end, gen_strand
     assert calculateGenomicPositions(dict_LRG_5_t1, 'chr1', 43210006, 43237755, '-1') == [
         ('chr1', 43213394, 43213469, 'exon_13'), ('chr1', 43213871, 43213988, 'exon_12'), ('chr1', 43215857, 43216007, 'exon_11'), 
         ('chr1', 43217945, 43218040, 'exon_10'), ('chr1', 43212006, 43212523, 'exon_15'), ('chr1', 43212943, 43213083, 'exon_14a'), 
@@ -110,3 +109,12 @@ def test_calculateGenomicPositions():
         ('chr13', 32905056, 32905167, 'exon_9'), ('chr13', 32903580, 32903629, 'exon_8'), ('chr13', 32893214, 32893462, 'exon_3'), 
         ('chr13', 32890559, 32890664, 'exon_2'), ('chr13', 32889617, 32889804, 'exon_1'), ('chr13', 32900636, 32900750, 'exon_7'), 
         ('chr13', 32900379, 32900419, 'exon_6'), ('chr13', 32900238, 32900287, 'exon_5'), ('chr13', 32899213, 32899321, 'exon_4')]
+
+
+    # Invalid strand inputs - should throw ValueError
+    with pytest.raises(ValueError):
+        calculateGenomicPositions(dict_LRG_293_t1, 'chr13', 32884617, 32975809, 1)
+    with pytest.raises(ValueError):
+        calculateGenomicPositions(dict_LRG_293_t1, 'chr13', 32884617, 32975809, '')
+    with pytest.raises(ValueError):
+        calculateGenomicPositions(dict_LRG_293_t1, 'chr13', 32884617, 32975809, '2')
