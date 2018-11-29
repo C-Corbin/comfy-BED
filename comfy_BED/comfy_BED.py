@@ -85,7 +85,7 @@ def getGenomeMapping(root, genome_build):
     return(chr, start, end, strand)
 
 
-def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_end, genome_strand):
+def calculateGenomicPositions(transcript_dict, chrom, genome_start, genome_end, genome_strand):
     '''
     add the genome_start number to the LRG exon boundaries, to convert them
     to genomic exon boundaries
@@ -98,13 +98,13 @@ def calculateGenomicPositions(chr, transcript_dict, genome_start, genome_end, ge
         if genome_strand == '1':
             gen_exon_start = genome_start + lrg_start -1
             gen_exon_end = genome_start + lrg_end -1
-            list_of_exons.append((chr, gen_exon_start, gen_exon_end, exon_label))
+            list_of_exons.append((chrom, gen_exon_start, gen_exon_end, exon_label))
         elif genome_strand == '-1':
             exon_length = lrg_end - lrg_start
             gen_exon_end = genome_end - lrg_end + 1
             gen_exon_start = gen_exon_end + exon_length
             # start and end are switch round because bed files should have the smallest value first
-            list_of_exons.append((chr, gen_exon_end, gen_exon_start, exon_label))
+            list_of_exons.append((chrom, gen_exon_end, gen_exon_start, exon_label))
         else:
             print('Cannot determine strand')
     return list_of_exons
@@ -138,7 +138,7 @@ def main():
         lrg_id = levels.find('id').text
 
     # extract chr, start, end, strand from mapping region of xml
-    chr, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
+    chrom, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
 
     # extract the exon boundries - lrg numbering - make into python dict
     # calculate genomic coordinates, depending on strand orientation
@@ -146,7 +146,7 @@ def main():
         transcript_name = str(transcript.get('name'))
         if transcript_name in args.transcripts:
             transcript_dict = getLrgExons(transcript, lrg_id)
-            exon_genomic_positions = calculateGenomicPositions(chr, transcript_dict, genome_start, genome_end, genome_strand)
+            exon_genomic_positions = calculateGenomicPositions(transcript_dict, chrom, genome_start, genome_end, genome_strand)
 
             # output in tab delimted text file
             #TODO add header, option to change filename, sorting

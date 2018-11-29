@@ -75,32 +75,32 @@ def test_calculateGenomicPositions():
 
 
     # test calculateGenomicPositions - input is chr, transcript_dict, gen_start, gen_end, gen_strand
-    assert calculateGenomicPositions('chr1', dict_LRG_5_t1, 43210006, 43237755, '-1') == [
+    assert calculateGenomicPositions(dict_LRG_5_t1, 'chr1', 43210006, 43237755, '-1') == [
         ('chr1', 43213394, 43213469, 'exon_13'), ('chr1', 43213871, 43213988, 'exon_12'), ('chr1', 43215857, 43216007, 'exon_11'), 
         ('chr1', 43217945, 43218040, 'exon_10'), ('chr1', 43212006, 43212523, 'exon_15'), ('chr1', 43212943, 43213083, 'exon_14a'), 
         ('chr1', 43218208, 43218335, 'exon_9'), ('chr1', 43220540, 43220661, 'exon_8'), ('chr1', 43224872, 43225061, 'exon_3'), 
         ('chr1', 43227994, 43228146, 'exon_2'), ('chr1', 43232178, 43232755, 'exon_1'), ('chr1', 43220836, 43220888, 'exon_7'), 
         ('chr1', 43221219, 43221308, 'exon_6'), ('chr1', 43223454, 43223593, 'exon_5'), ('chr1', 43224523, 43224654, 'exon_4')]
 
-    assert calculateGenomicPositions('chr1', dict_LRG_5_t2, 43210006, 43237755, '-1') == [
+    assert calculateGenomicPositions(dict_LRG_5_t2, 'chr1', 43210006, 43237755, '-1') == [
         ('chr1', 43213394, 43213469, 'exon_13'), ('chr1', 43213871, 43213988, 'exon_12'), ('chr1', 43215857, 43216007, 'exon_11'), 
         ('chr1', 43217945, 43218040, 'exon_10'), ('chr1', 43212006, 43212523, 'exon_15'), ('chr1', 43212924, 43213083, 'exon_14b'), 
         ('chr1', 43218208, 43218335, 'exon_9'), ('chr1', 43220540, 43220661, 'exon_8'), ('chr1', 43224872, 43225061, 'exon_3'), 
         ('chr1', 43227994, 43228146, 'exon_2'), ('chr1', 43232178, 43232755, 'exon_1'), ('chr1', 43220836, 43220888, 'exon_7'), 
         ('chr1', 43221219, 43221308, 'exon_6'), ('chr1', 43223454, 43223593, 'exon_5'), ('chr1', 43224523, 43224654, 'exon_4')]
 
-    assert calculateGenomicPositions('chr1', dict_LRG_5_t3, 43210006, 43237755, '-1') == [
+    assert calculateGenomicPositions(dict_LRG_5_t3, 'chr1', 43210006, 43237755, '-1') == [
         ('chr1', 43213394, 43213469, 'exon_13'), ('chr1', 43213871, 43213988, 'exon_12'), ('chr1', 43215857, 43216007, 'exon_11'), 
         ('chr1', 43217945, 43218040, 'exon_10'), ('chr1', 43212006, 43213083, 'exon_14c'), ('chr1', 43218208, 43218335, 'exon_9'), 
         ('chr1', 43220540, 43220661, 'exon_8'), ('chr1', 43224872, 43225061, 'exon_3'), ('chr1', 43227994, 43228146, 'exon_2'), 
         ('chr1', 43232178, 43232755, 'exon_1'), ('chr1', 43220836, 43220888, 'exon_7'), ('chr1', 43221219, 43221308, 'exon_6'), 
         ('chr1', 43223454, 43223593, 'exon_5'), ('chr1', 43224523, 43224654, 'exon_4')]
 
-    assert calculateGenomicPositions('chr11',dict_LRG_9_t1 , 111952571, 111992353, '1') == [
+    assert calculateGenomicPositions(dict_LRG_9_t1, 'chr11', 111952571, 111992353, '1') == [
         ('chr11', 111959591, 111959735, 'exon_3'), ('chr11', 111958581, 111958697, 'exon_2'), ('chr11', 111957548, 111957683, 'exon_1'), 
         ('chr11', 111965529, 111966525, 'exon_4')]
 
-    assert calculateGenomicPositions('chr13', dict_LRG_293_t1, 32884617, 32975809, '1') == [
+    assert calculateGenomicPositions(dict_LRG_293_t1, 'chr13', 32884617, 32975809, '1') == [
         ('chr13', 32953454, 32953652, 'exon_22'), ('chr13', 32953887, 32954050, 'exon_23'), ('chr13', 32945093, 32945237, 'exon_20'), 
         ('chr13', 32950807, 32950928, 'exon_21'), ('chr13', 32971035, 32971181, 'exon_26'), ('chr13', 32972299, 32973809, 'exon_27'), 
         ('chr13', 32954144, 32954282, 'exon_24'), ('chr13',32968826, 32969070, 'exon_25'), ('chr13', 32920964, 32921033, 'exon_13'), 
