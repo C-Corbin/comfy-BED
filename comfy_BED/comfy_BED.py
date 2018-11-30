@@ -4,6 +4,7 @@ import os
 import csv
 import xml.etree.ElementTree as ET
 import datetime
+import six
 
 
 # load arguments
@@ -112,10 +113,11 @@ def calculateGenomicPositions(transcript_dict, chrom, gen_start, gen_end, strand
     list_of_exons = []
 
     # loop through exon dictionary, extract exon name, lrg start and end
-    for item in transcript_dict.iteritems():
-        exon_label = str(item[0])
-        lrg_start = int(item[1][0])
-        lrg_end = int(item[1][1])
+    # use six library for iterating as it has support for both python 2 and 3
+    for transcript in six.iteritems(transcript_dict):
+        exon_label = str(transcript[0])
+        lrg_start = int(transcript[1][0])
+        lrg_end = int(transcript[1][1])
 
         # if strand is 5' -> 3'
         if strand == '1':
