@@ -52,7 +52,7 @@ def test_getLrgExons():
 
     #LRG_293 variables
     #LRG_293 has only t1. Strand = 1.
-    tree_LRG_293 = ET.parse(os.path.abspath("test_data/LRG_293.xml"))
+    tree_LRG_293 = ET.parse(os.path.abspath("tests/test_data/LRG_293.xml"))
     root_LRG_293 = tree_LRG_293.getroot()
     LRG_ID_293 = "LRG_293"
     LRG_293_t1 = "t1" #Valid transcript for LRG_293
@@ -68,7 +68,7 @@ def test_getLrgExons():
 
     #LRG_5 variables
     #LRG_5 has t1, t2 and t3. t3 was added after LRG_5 was made public. Strand = -1.
-    tree_LRG_5 = ET.parse(os.path.abspath("test_data/LRG_5.xml"))
+    tree_LRG_5 = ET.parse(os.path.abspath("tests/test_data/LRG_5.xml"))
     root_LRG_5 = tree_LRG_5.getroot()
     LRG_ID_5 = "LRG_5"
     LRG_5_t1 = "t1" #Valid transcript
