@@ -1,7 +1,7 @@
 import pytest
 import os
 
-from comfy_BED.web import getLrgId
+from comfy_BED.web import getLrgId, checkLrgExists
 
 def test_getLrgId():
     # lrg ID and HGNC gene name
@@ -24,7 +24,13 @@ def test_getLrgId():
 
 
 def test_CheckLrgExists():
-    pass
+    # LRG ID that exists
+    assert checkLrgExists('LRG_1') == True
+
+    # LRG ID that doesn't exist - should throw assertion error
+    with pytest.raises(AssertionError):
+        checkLrgExists('not_an_lrg')
+
 
 def test_getLrgStatus():
     pass
