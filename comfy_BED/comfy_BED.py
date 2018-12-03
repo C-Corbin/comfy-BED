@@ -4,6 +4,7 @@ import os
 import csv
 import xml.etree.ElementTree as ET
 import datetime
+import logging
 
 
 # load arguments
@@ -48,6 +49,12 @@ def getArgs():
     ))
 
     return parser.parse_args()
+
+
+def setUpLogs(args, now):
+    log_filename = now.strftime("%Y-%m-%d") + "_comfy_BED" + ".log"
+    #TODO put the LRG_ID in the filename
+    logging.basicConfig(filename=log_filename, level=logging.DEBUG)
 
 
 def getLrgExons(transcript, lrg_id):
@@ -124,18 +131,30 @@ def writeToFile(data_list, file_name, now):
 def main():
     args = getArgs()
     now = datetime.datetime.now()
+    # set up logs
+    setUpLogs(args, now)
+    logging.info("comfy_BED started running at: " + str(now))
+
+    #quick file checks
     assert os.path.isfile(args.input_LRG), 'The input is not a file.'
+    if os.path.isfile(args.input_LRG) == False:
+        logging.error("The input file is not a file")
     assert args.input_LRG.endswith('.xml'), 'The input file is not an xml file.'
+    if args.input_LRG.endswith('.xml') == False:
+        logging.error("The input file is not an .xml file")
 
     # create xml element tree object
     # test that file is an lrg (root.tag)
     tree = ET.parse(os.path.abspath(args.input_LRG))
     root = tree.getroot()
     assert root.tag.upper() == "LRG", 'The input file is not an LRG file'
+    if root.tag.upper() != "LRG":
+        logging.error("The input file is not an LRG file")
 
     # get lrg id
     for levels in root.iter('fixed_annotation'):
         lrg_id = levels.find('id').text
+        logging.info("The LRG_ID is: " + lrg_id)
 
     # extract chr, start, end, strand from mapping region of xml
     chr, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
@@ -152,7 +171,7 @@ def main():
             #TODO add header, option to change filename, sorting
             file_name = '{}_{}.bed'.format(lrg_id, transcript_name)
             writeToFile(exon_genomic_positions, file_name, now)
-
+    logging.info("comfy_BED run complete")
 
 if __name__ == '__main__':
     main()
