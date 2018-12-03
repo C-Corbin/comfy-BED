@@ -68,7 +68,19 @@ def checkLrgExists(lrg_id):
     the function will return as true, since the LRG ID can be found 
     through the API and therefore it exists.
     '''
-    pass
+    
+    # query api, returns xml that says whether lrg exists or not
+    lrg_query_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg?query={}'.format(lrg_id)
+    lrg_query_response = requests.get(lrg_query_url)
+    assert lrg_query_response.status_code == 200, 'Could not query the API, check your connection and try again.'
+
+    # parse the section that says if lrg exists or not, throw assertion error if it doesn't
+    root = ET.fromstring(lrg_query_response.text)
+    for child in root.iter('hitCount'):
+        assert child.text == '1', 'LRG does not exist'
+    
+    # if no assertion error is thrown, return true
+    return True
 
 
 def getLrgStatus(lrg_id):
