@@ -10,17 +10,19 @@ Code to produce BED files from LRG files.
 
 ### Set up either a conda or virtual environment:
 
+comfy_BED has been designed to work with both Python 2 and Python 3
+
 #### Conda environment
 
 - Set up conda environment: `conda env create -f requirements_conda.yaml`
 
-- Activate the conda environment: `conda activate comfy-bed`
+- Activate the conda environment: `conda activate comfy-env`
 
 - To exit conda environment: `conda deactivate`
 
 #### Virtual environment
 
-- Set up virtual env with python2 as Python interpreter: `virtualenv --python=/usr/bin/python2.7 comfy-env`
+- Set up virtual env with python2 as Python interpreter: `virtualenv comfy-env`
 
 - Activate the virtual environment: `source comfy-env/bin/activate`
 
