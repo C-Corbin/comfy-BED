@@ -52,8 +52,12 @@ def getArgs():
 
 
 def setUpLogs(args, now):
+    '''
+    Makes a log file to help with spotting errors in LRG-to-BED conversion
+    Log file name ends with .log and will contain the current date, LRG ID, and 'comfy_BED'
+    Log file created by day and appends to day
+    '''
     log_filename = now.strftime("%Y-%m-%d") + "_comfy_BED" + ".log"
-    #TODO put the LRG_ID in the filename
     logging.basicConfig(filename=log_filename, level=logging.DEBUG)
 
 
@@ -71,6 +75,7 @@ def getLrgExons(transcript, lrg_id):
                 start = int(coordinate.get('start'))
                 end = int(coordinate.get('end'))
         transcript_dict[name] = (start, end)
+    logging.info("Fetched start and end coordinates of LRG exons")
     return(transcript_dict)
 
 
@@ -89,6 +94,7 @@ def getGenomeMapping(root, genome_build):
                 start = int(m_span.get('other_start'))
                 end = int(m_span.get('other_end'))
                 strand = str(m_span.get('strand'))
+    logging.info("Obtained the LRG and genomic coordinates of the start and end of the selected LRG gene")
     return(chr, start, end, strand)
 
 
@@ -141,7 +147,7 @@ def calculateGenomicPositions(transcript_dict, chrom, gen_start, gen_end, strand
         else:
             # raise a value error if strand is anything other than 1 or -1
             raise ValueError('Cannot determine strand')
-
+    logging.info("Converted LRG start-and-end coordinates, to genomic coordinates, for the user-selected genome build and transcript")
     return list_of_exons
 
 
@@ -154,6 +160,8 @@ def writeToFile(data_list, file_name, now):
         writer = csv.writer(out, delimiter='\t')
         for row in data_list:
             writer.writerow(row)
+    logging.info("Wrote exon start-and-end coordinates, for the user-selected genome build and transcript, to BED file")
+    logging.info("The BED file is named: " + file_name)
 
 
 def main():
@@ -182,16 +190,20 @@ def main():
     # get lrg id
     for levels in root.iter('fixed_annotation'):
         lrg_id = levels.find('id').text
-        logging.info("The LRG_ID is: " + lrg_id)
+        logging.info("LRG_ID: " + lrg_id)
 
     # extract chr, start, end, strand from mapping region of xml
+    logging.info("Genome build: " + str(args.genome_build))
     chrom, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
-
-    # extract the exon boundries - lrg numbering - make into python dict
+    logging.info("Chromosome: " + chrom)
+    logging.info("Strand: " + genome_strand)
+    logging.info("Start position of gene on " + args.genome_build + ": " + str(genome_start))
+    logging.info("End position of gene on " + args.genome_build + ": " + str(genome_end))    # extract the exon boundries - lrg numbering - make into python dict
     # calculate genomic coordinates, depending on strand orientation
     for transcript in root.iter('transcript'):
         transcript_name = str(transcript.get('name'))
         if transcript_name in args.transcripts:
+            logging.info("Started BED production for transcript: " + transcript_name)
             transcript_dict = getLrgExons(transcript, lrg_id)
             exon_genomic_positions = calculateGenomicPositions(transcript_dict, chrom, genome_start, genome_end, genome_strand)
 
@@ -199,6 +211,7 @@ def main():
             #TODO add header, option to change filename, sorting
             file_name = '{}_{}.bed'.format(lrg_id, transcript_name)
             writeToFile(exon_genomic_positions, file_name, now)
+            logging.info("Completed BED production for transcript: " + transcript_name)
     logging.info("comfy_BED run complete")
 
 if __name__ == '__main__':
