@@ -121,7 +121,17 @@ def getLrgXml(lrg_id, lrg_status):
     Output -
     lrg_xml: String. String of entire LRG XML file.
     '''
-    pass
+    # get api, address is different depending on whether lrg is public or pending
+    if lrg_status == 'public':
+        xml_url = 'http://ftp.ebi.ac.uk/pub/databases/lrgex/{}.xml'.format(lrg_id)
+    if lrg_status == 'pending':
+        xml_url = 'http://ftp.ebi.ac.uk/pub/databases/lrgex/pending/{}.xml'.format(lrg_id)
+    xml_response = requests.get(xml_url)
+    assert xml_response.status_code == 200, 'Could not query the API, check your connection and try again.'
+
+    # return response as string
+    lrg_xml = xml_response.text
+    return(lrg_xml)
 
 
 def getLrgWeb(input_text):
