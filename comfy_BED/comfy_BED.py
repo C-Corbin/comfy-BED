@@ -13,21 +13,41 @@ def getArgs():
     Use argparse package to take arguments from the command line. 
     See descriptions for full detail of each argument.
     """
-
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
         description=textwrap.dedent(
         '''
         summary:
         Takes an LRG xml file and returns a BED file of exon co-ordinates.
+
+        examples:
+        python comfy_BED.py -w LRG_1 -t t1 -g GRCh37
+          Pulls LRG_1 from the web and outputs a BED file of transcript 1 in GRCh37
+        
+        python comfy_BED.py -l ~/Documents/LRG_1.xml -t t1,t2 -g GRCh38
+          Loads a local copy of LRG_1 from the web and outputs a BED file oin GRCh38 
+          for each of transcript 1 and transcript 2
         '''
     ))
 
-    # path to xml - test is a file, xml ending
-    parser.add_argument(
-        'input_LRG', action='store', 
-        help='Filepath to input LRG xml file. REQUIRED.'
+    # make option to include either local or web input (not both)
+    input_method = parser.add_mutually_exclusive_group(required=True)
+
+    # path to local xml
+    input_method.add_argument(
+        '-l', '--local_input', action='store', 
+        help='The filepath to a local input LRG xml file'
     )
+
+    # web option
+    input_method.add_argument(
+        '-w', '--web_input', action='store', 
+        help=textwrap.dedent(
+        '''
+        An LRG identifier, can be either LRG ID, HGNC symbol, Ensembl or RefSeq transcript ID.
+        Pulls the LRG xml from the web via the LRG API.
+        '''
+    ))
 
     # transcript options
     parser.add_argument(
@@ -153,13 +173,22 @@ def writeToFile(data_list, file_name, now):
 def main():
     args = getArgs()
     now = datetime.datetime.now()
-    assert os.path.isfile(args.input_LRG), 'The input is not a file.'
-    assert args.input_LRG.endswith('.xml'), 'The input file is not an xml file.'
+    
+    # load data from either local input or web api
+    if args.local_input:
+        # check that input file is valid
+        assert os.path.isfile(args.local_input), 'The input is not a file.'
+        assert args.local_input.endswith('.xml'), 'The input file is not an xml file.'
 
-    # create xml element tree object
-    # test that file is an lrg (root.tag)
-    tree = ET.parse(os.path.abspath(args.input_LRG))
-    root = tree.getroot()
+        # make xml element tree
+        tree = ET.parse(os.path.abspath(args.local_input))
+        root = tree.getroot()
+
+    elif args.web_input:
+        # add web script here
+        pass
+
+    # test that file is an lrg (root.tag should be LRG)
     assert root.tag.upper() == "LRG", 'The input file is not an LRG file'
 
     # get lrg id
