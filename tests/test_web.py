@@ -4,6 +4,7 @@ import hashlib
 
 from comfy_BED.web import getLrgId, checkLrgExists, getLrgStatus, getLrgXml
 
+
 def test_getLrgId():
     # lrg ID and HGNC gene name
     assert getLrgId('LRG_1') == 'LRG_1'
@@ -24,7 +25,7 @@ def test_getLrgId():
         getLrgId('invalid_input')
 
 
-def test_CheckLrgExists():
+def test_checkLrgExists():
     # LRG ID that exists
     assert checkLrgExists('LRG_1') == True
 
@@ -52,7 +53,7 @@ def test_getLrgXml():
     Since the LRGs are regularly updated, this test might fail. If it 
     does, download the latest LRG_1.xml file from the LRG website, 
     replace tests/test_data/LRG_1.xml and re-run the tests.
-    
+
     I've used a new LRG from the different tests in case updating the 
     file affects the other tests, so we should keep LRG_1 for this test only
     '''
@@ -67,7 +68,3 @@ def test_getLrgXml():
 
     # check that the checksums are the same
     assert LRG_1_file_md5 == LRG_1_web_md5
-
-
-def test_getLrgWeb():
-    pass
