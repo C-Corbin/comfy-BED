@@ -6,6 +6,8 @@ import xml.etree.ElementTree as ET
 import datetime
 import six
 
+from comfy_BED_web import getLrgFromWeb
+
 
 # load arguments
 def getArgs():
@@ -180,13 +182,14 @@ def main():
         assert os.path.isfile(args.local_input), 'The input is not a file.'
         assert args.local_input.endswith('.xml'), 'The input file is not an xml file.'
 
-        # make xml element tree
+        # make xml element tree object
         tree = ET.parse(os.path.abspath(args.local_input))
         root = tree.getroot()
 
     elif args.web_input:
-        # add web script here
-        pass
+        # get xml as string from web api and make into xml element tree object
+        xml_string = getLrgFromWeb(args.web_input)
+        root = ET.fromstring(xml_string)
 
     # test that file is an lrg (root.tag should be LRG)
     assert root.tag.upper() == "LRG", 'The input file is not an LRG file'
