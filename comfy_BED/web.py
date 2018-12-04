@@ -14,7 +14,6 @@ def getLrgId(input_text):
     lrg_id: String. The LRG ID in the format LRG_<number>. If the 
       LRG ID can't be calculated from the input, an error will be thrown.
     '''
-    
     # if input is an lrg number, save the variable
     if input_text.startswith('LRG_'):
         lrg_id = input_text
@@ -68,7 +67,6 @@ def checkLrgExists(lrg_id):
     the function will return as true, since the LRG ID can be found 
     through the API and therefore it exists.
     '''
-    
     # query api, returns xml that says whether lrg exists or not
     lrg_query_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg?query={}'.format(lrg_id)
     lrg_query_response = requests.get(lrg_query_url)
@@ -96,7 +94,19 @@ def getLrgStatus(lrg_id):
     Output -
     lrg_status: String. Pulled from the API response, either public or pending.
     '''
-    pass
+    # query api, returns xml with status nested within it
+    status_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg/entry/{}?fields=status'.format(lrg_id)
+    status_response = requests.get(status_url)
+    assert status_response.status_code == 200, 'Could not query the API, check your connection and try again.'
+
+    # extract status from the xml
+    root = ET.fromstring(status_response.text)
+    for child in root.iter('value'):
+        lrg_status = child.text
+
+    #TODO Add warning if pending
+
+    return(lrg_status)
 
 
 def getLrgXml(lrg_id, lrg_status):
