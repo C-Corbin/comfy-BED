@@ -134,12 +134,17 @@ def getLrgXml(lrg_id, lrg_status):
     return(lrg_xml)
 
 
-def getLrgWeb(input_text):
+def getLrgFromWeb(input_text):
     '''
+    Main web API script, calls the functions above to:
     - if gene name/ transcript name, get lrg id, if already an lrg id then save lrg_id
     - check lrg exists
     - get status of the lrg
     - get xml file from the api
     '''
-    pass
+    lrg_id = getLrgId(input_text)
+    assert checkLrgExists(lrg_id)
+    lrg_status = getLrgStatus(lrg_id)
+    lrg_xml = getLrgXml(lrg_id, lrg_status)
 
+    return(lrg_xml)
