@@ -9,27 +9,50 @@ import logging
 import requests
 import json
 
+from comfy_BED_web import checkCurrentLrgStatus, getLrgFromWeb
+
+
 # load arguments
 def getArgs():
     """
     Use argparse package to take arguments from the command line. 
     See descriptions for full detail of each argument.
     """
-
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
         description=textwrap.dedent(
         '''
         summary:
         Takes an LRG xml file and returns a BED file of exon co-ordinates.
+
+        examples:
+        python comfy_BED.py -w LRG_1 -t t1 -g GRCh37
+          Pulls LRG_1 from the web and outputs a BED file of transcript 1 in GRCh37
+        
+        python comfy_BED.py -l ~/Documents/LRG_1.xml -t t1,t2 -g GRCh38
+          Loads a local copy of LRG_1 from the web and outputs a BED file oin GRCh38 
+          for each of transcript 1 and transcript 2
         '''
     ))
 
-    # path to xml - test is a file, xml ending
-    parser.add_argument(
-        'input_LRG', action='store', 
-        help='Filepath to input LRG xml file. REQUIRED.'
+    # make option to include either local or web input (not both)
+    input_method = parser.add_mutually_exclusive_group(required=True)
+
+    # path to local xml
+    input_method.add_argument(
+        '-l', '--local_input', action='store', 
+        help='The filepath to a local input LRG xml file'
     )
+
+    # web option
+    input_method.add_argument(
+        '-w', '--web_input', action='store', 
+        help=textwrap.dedent(
+        '''
+        An LRG identifier, can be either LRG ID, HGNC symbol, Ensembl or RefSeq transcript ID.
+        Pulls the LRG xml from the web via the LRG API.
+        '''
+    ))
 
     # transcript options
     parser.add_argument(
@@ -49,7 +72,6 @@ def getArgs():
         Select genome build from 'GRCh37' or 'GRCh38'. Defaults to GRCh37.
         '''
     ))
-
     return parser.parse_args()
 
 
@@ -61,39 +83,6 @@ def setUpLogs(args, now):
     '''
     log_filename = now.strftime("%Y-%m-%d") + "_comfy_BED" + ".log"
     logging.basicConfig(filename=log_filename, level=logging.DEBUG)
-
-
-def checkCurrentLrgStatus(lrg_id):
-    '''
-    Checks the CURRENT status of the user-provided LRG ID on LRG website, returns information to the BED header and log file
-    'Public' LRGs have a 'fixed annotation' section which has been fully finalised
-    'Pending' LRGs do NOT have a finalised 'fixed annotation' section
-    WARNING: User-provided XMLs contain no information as to whether they were public or private at time of download
-    The end user should always download their XMLs very shortly before use
-    '''
-    #get data from webservice
-    url_p1 = "https://www.ebi.ac.uk/ebisearch/ws/rest/lrg/entry/"
-    url_p3 = "?fields=status&format=json"
-    url_full = url_p1 + str(lrg_id) + url_p3
-    logging.info("Checking status with webservice: " + str(url_full))
-    data_return = requests.get(url_full)
-    parsed_data_return = data_return.json()
-
-    # parse the returned data, return status and log message
-    lrg_status_return = parsed_data_return['entries'][0]['fields']['status'][0]
-    if lrg_status_return == "public":
-        lrg_status_message = "The LRG is currently marked 'public' on the LRG website: note that the user-provided file could have been downloaded before the LRG going public"
-    else:
-        if lrg_status_return == "pending":
-            lrg_status_message = "The LRG is currently marked 'pending' on the LRG website: the fixed annotation is not yet finalised, so it should be interpreted with caution"
-    assert (lrg_status_return == "public") or (lrg_status_return == "pending"), "The LRG status could not be resolved as public or private"
-    if (lrg_status_return != "public") and (lrg_status_return != "pending"):
-        logging.error("The LRG status could not be resolved as public or pending")
-        lrg_status_message = "ERROR: The LRG status could not be resolved with the webservice as public or pending"
-
-    logging.info("LRG status is: " + lrg_status_return)
-    logging.info(lrg_status_message)
-    return lrg_status_return, lrg_status_message
 
 
 def getLrgExons(transcript, lrg_id):
@@ -203,22 +192,27 @@ def writeToFile(lrg_status, lrg_status_message, data_list, file_name, now):
 def main():
     args = getArgs()
     now = datetime.datetime.now()
+
     # set up logs
     setUpLogs(args, now)
     logging.info("comfy_BED started running at: " + str(now))
 
-    #quick file checks
-    assert os.path.isfile(args.input_LRG), 'The input is not a file.'
-    if os.path.isfile(args.input_LRG) == False:
-        logging.error("The input file is not a file")
-    assert args.input_LRG.endswith('.xml'), 'The input file is not an xml file.'
-    if args.input_LRG.endswith('.xml') == False:
-        logging.error("The input file is not an .xml file")
+    # load data from either local input or web api
+    if args.local_input:
+        # check that input file is valid
+        assert os.path.isfile(args.local_input), 'The input is not a file.'
+        assert args.local_input.endswith('.xml'), 'The input file is not an xml file.'
 
-    # create xml element tree object
-    # test that file is an lrg (root.tag)
-    tree = ET.parse(os.path.abspath(args.input_LRG))
-    root = tree.getroot()
+        # make xml element tree object
+        tree = ET.parse(os.path.abspath(args.local_input))
+        root = tree.getroot()
+
+    elif args.web_input:
+        # get xml as string from web api and make into xml element tree object
+        xml_string = getLrgFromWeb(args.web_input)
+        root = ET.fromstring(xml_string)
+
+    # test that file is an lrg (root.tag should be LRG)
     assert root.tag.upper() == "LRG", 'The input file is not an LRG file'
     if root.tag.upper() != "LRG":
         logging.error("The input file is not an LRG file")
