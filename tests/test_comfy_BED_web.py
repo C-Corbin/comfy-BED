@@ -2,7 +2,7 @@ import pytest
 import os
 import hashlib
 
-from comfy_BED.web import getLrgId, checkLrgExists, getLrgStatus, getLrgXml
+from comfy_BED.comfy_BED_web import getLrgId, checkLrgExists, checkCurrentLrgStatus, getLrgXml
 
 
 def test_getLrgId():
@@ -34,14 +34,14 @@ def test_checkLrgExists():
         checkLrgExists('invalid_input')
 
 
-def test_getLrgStatus():
-    # Public and pending LRGs
-    assert getLrgStatus('LRG_5') == 'public'
-    assert getLrgStatus('LRG_9') == 'pending'
+def test_checkCurrentLrgStatus():
+    # Public and pending LRGs - returns tuple of status and status error, check that status matches
+    assert checkCurrentLrgStatus('LRG_5')[0] == 'public'
+    assert checkCurrentLrgStatus('LRG_9')[0] == 'pending'
 
-    # LRG that doesn't exist
-    with pytest.raises(UnboundLocalError):
-        getLrgStatus('invalid_input')
+    # LRG that doesn't exist (throws index error as it trys to parse json output that wasnt retrieved)
+    with pytest.raises(IndexError):
+        checkCurrentLrgStatus('invalid_input')
 
 
 def test_getLrgXml():

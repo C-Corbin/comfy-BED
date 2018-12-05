@@ -1,4 +1,5 @@
 import requests
+import logging
 import xml.etree.ElementTree as ET
 
 
@@ -81,32 +82,37 @@ def checkLrgExists(lrg_id):
     return True
 
 
-def getLrgStatus(lrg_id):
+def checkCurrentLrgStatus(lrg_id):
     '''
-    Get the release status of an LRG (either public or pending). If an 
-    LRG is pending, thrown a warning to use the data with caution since
-    the contents of the LRG are yet to be confirmed.
-
-    Input -
-    lrg_id: String. An LRG ID to check the status of. Must be in the 
-      format LRG_<number>
-
-    Output -
-    lrg_status: String. Pulled from the API response, either public or pending.
+    Checks the CURRENT status of the user-provided LRG ID on LRG website, returns information to the BED header and log file
+    'Public' LRGs have a 'fixed annotation' section which has been fully finalised
+    'Pending' LRGs do NOT have a finalised 'fixed annotation' section
+    WARNING: User-provided XMLs contain no information as to whether they were public or private at time of download
+    The end user should always download their XMLs very shortly before use
     '''
-    # query api, returns xml with status nested within it
-    status_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg/entry/{}?fields=status'.format(lrg_id)
-    status_response = requests.get(status_url)
-    assert status_response.status_code == 200, 'Could not query the API, check your connection and try again.'
+    #get data from webservice
+    url_p1 = "https://www.ebi.ac.uk/ebisearch/ws/rest/lrg/entry/"
+    url_p3 = "?fields=status&format=json"
+    url_full = url_p1 + str(lrg_id) + url_p3
+    logging.info("Checking status with webservice: " + str(url_full))
+    data_return = requests.get(url_full)
+    parsed_data_return = data_return.json()
 
-    # extract status from the xml
-    root = ET.fromstring(status_response.text)
-    for child in root.iter('value'):
-        lrg_status = child.text
+    # parse the returned data, return status and log message
+    lrg_status_return = parsed_data_return['entries'][0]['fields']['status'][0]
+    if lrg_status_return == "public":
+        lrg_status_message = "The LRG is currently marked 'public' on the LRG website: note that the user-provided file could have been downloaded before the LRG going public"
+    else:
+        if lrg_status_return == "pending":
+            lrg_status_message = "The LRG is currently marked 'pending' on the LRG website: the fixed annotation is not yet finalised, so it should be interpreted with caution"
+    assert (lrg_status_return == "public") or (lrg_status_return == "pending"), "The LRG status could not be resolved as public or private"
+    if (lrg_status_return != "public") and (lrg_status_return != "pending"):
+        logging.error("The LRG status could not be resolved as public or pending")
+        lrg_status_message = "ERROR: The LRG status could not be resolved with the webservice as public or pending"
 
-    #TODO Add warning if pending
-
-    return(lrg_status)
+    logging.info("LRG status is: " + lrg_status_return)
+    logging.info(lrg_status_message)
+    return lrg_status_return, lrg_status_message
 
 
 def getLrgXml(lrg_id, lrg_status):
@@ -144,7 +150,7 @@ def getLrgFromWeb(input_text):
     '''
     lrg_id = getLrgId(input_text)
     assert checkLrgExists(lrg_id)
-    lrg_status = getLrgStatus(lrg_id)
+    lrg_status = checkCurrentLrgStatus(lrg_id)[0]
     lrg_xml = getLrgXml(lrg_id, lrg_status)
 
     return(lrg_xml)
