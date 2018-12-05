@@ -349,7 +349,7 @@
           <email>raymond.dalgleish@le.ac.uk</email>
         </contact>
       </source>
-      <modification_date>2018-12-03</modification_date>
+      <modification_date>2018-12-05</modification_date>
     </annotation_set>
     <annotation_set type="lrg">
       <source>
@@ -361,7 +361,7 @@
           <email>feedback@lrg-sequence.org</email>
         </contact>
       </source>
-      <modification_date>2018-12-03</modification_date>
+      <modification_date>2018-12-05</modification_date>
       <mapping coord_system="GRCh37.p13" other_name="17" other_id="NC_000017.10" other_id_syn="CM000679.1" other_start="48259457" other_end="48284000" type="other_assembly">
         <mapping_span lrg_start="1" lrg_end="24544" other_start="48259457" other_end="48284000" strand="-1">
           <diff type="mismatch" lrg_start="18506" lrg_end="18506" other_start="48265495" other_end="48265495" lrg_sequence="G" other_sequence="A" />
@@ -383,7 +383,7 @@
         </contact>
       </source>
       <comment>Annotation from NG_007400.1</comment>
-      <modification_date>2018-11-29</modification_date>
+      <modification_date>2018-12-04</modification_date>
       <mapping coord_system="NM_000088.3" other_name="NM_000088.3" other_id="NM_000088.3" other_start="1" other_end="5927" type="transcript">
         <mapping_span lrg_start="5001" lrg_end="5229" other_start="1" other_end="229" strand="1" />
         <mapping_span lrg_start="6693" lrg_end="6887" other_start="230" other_end="424" strand="1" />
@@ -633,7 +633,7 @@
         </contact>
       </source>
       <comment>Annotation is based on Ensembl release 94 (GRCh38  primary assembly)</comment>
-      <modification_date>2018-12-03</modification_date>
+      <modification_date>2018-12-05</modification_date>
       <mapping coord_system="ENST00000225964.9" other_name="ENST00000225964.9" other_id="ENST00000225964.9" other_start="1" other_end="6727" type="transcript">
         <mapping_span lrg_start="5008" lrg_end="5229" other_start="1" other_end="222" strand="1" />
         <mapping_span lrg_start="6693" lrg_end="6887" other_start="223" other_end="417" strand="1" />
@@ -1136,7 +1136,7 @@
       <source>
         <name>Community</name>
       </source>
-      <modification_date>2018-12-03</modification_date>
+      <modification_date>2018-12-05</modification_date>
       <fixed_transcript_annotation name="t1">
         <other_exon_naming description="Alternative numbering based on Osteogenesis Imperfecta Variant Database - COL1A1">
           <url>http://www.le.ac.uk/genetics/collagen/nomenclature.html#exon_numbering</url>
@@ -1356,7 +1356,7 @@
         <name>List of locus specific databases for COL1A1</name>
         <url>http://grenada.lumc.nl/LSDB_list/lsdbs/COL1A1</url>
       </source>
-      <modification_date>2018-12-03</modification_date>
+      <modification_date>2018-12-05</modification_date>
     </annotation_set>
   </updatable_annotation>
 </lrg>
