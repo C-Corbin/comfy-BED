@@ -3,3 +3,4 @@ dependencies:
 - python=2.7
 - pytest=3.3.2
 - requests=2.20.1
+- six==1.11.0
