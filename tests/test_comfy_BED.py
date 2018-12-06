@@ -2,7 +2,7 @@ import pytest
 import os
 import xml.etree.ElementTree as ET
 
-from comfy_BED.comfy_BED import getGenomeMapping, calculateGenomicPositions, getLrgExons
+from comfy_BED.comfy_BED.comfy_BED import checkValidTranscripts, calculateGenomicPositions, getLrgExons
 
 '''
 def test_get_args(self):
@@ -11,23 +11,45 @@ def test_get_args(self):
     assert args.path.endswith('.xml'), 'The input file is not an xml file.'
 '''
 
+def test_checkValidTranscripts():
+    # Setup - make a root xml tree for each test set
+    # Setup - need mock arg.transcripts
+    # 5' 3' public
+    tree_LRG_5 = ET.parse(os.path.abspath("test_data/LRG_5.xml"))
+    root_LRG_5 = tree_LRG_5.getroot()
+
+    # 3' 5' public
+    tree_LRG_9 = ET.parse(os.path.abspath("test_data/LRG_9.xml"))
+    root_LRG_9 = tree_LRG_9.getroot()
+
+    # Pending LRG with gene in 5' -> 3' orientation
+    tree_LRG_9 = ET.parse(os.path.abspath("test_data/LRG_9.xml"))
+    root_LRG_9 = tree_LRG_9.getroot()
+
+    common_transcript = "t1"
+    common_transcript_list = "t1,t2"
+    rarer_transcript = "t4"
+    invalid_transcript = "t5"
+
+    assert checkValidTranscripts(common_transcript, root_LRG_5) == True, "LRG_5 transcript 1 wrongly marked as invalid"
+
 
 def test_getGenomeMapping():
     # Setup - make a root xml tree for each test set:
     # Public LRG with gene in 3' -> 5' orientation
-    tree_LRG_5 = ET.parse(os.path.abspath("tests/test_data/LRG_5.xml"))
+    tree_LRG_5 = ET.parse(os.path.abspath("test_data/LRG_5.xml"))
     root_LRG_5 = tree_LRG_5.getroot()
 
     # Pending LRG with gene in 5' -> 3' orientation
-    tree_LRG_9 = ET.parse(os.path.abspath("tests/test_data/LRG_9.xml"))
+    tree_LRG_9 = ET.parse(os.path.abspath("test_data/LRG_9.xml"))
     root_LRG_9 = tree_LRG_9.getroot()
 
     # Public LRG with gene in 5' -> 3' orientation
-    tree_LRG_293 = ET.parse(os.path.abspath("tests/test_data/LRG_293.xml"))
+    tree_LRG_293 = ET.parse(os.path.abspath("test_data/LRG_293.xml"))
     root_LRG_293 = tree_LRG_293.getroot()
 
     # LRG_293 with mapping section removed - should throw error
-    tree_LRG_293_mapping_removed = ET.parse(os.path.abspath("tests/test_data/LRG_293_mapping_removed.xml"))
+    tree_LRG_293_mapping_removed = ET.parse(os.path.abspath("test_data/LRG_293_mapping_removed.xml"))
     root_LRG_293_mapping_removed = tree_LRG_293_mapping_removed.getroot()
 
     # Test that genome mapping is parsed correctly for each test set, with both genome builds
@@ -52,7 +74,7 @@ def test_getLrgExons():
 
     #LRG_293 variables
     #LRG_293 has only t1. Strand = 1.
-    tree_LRG_293 = ET.parse(os.path.abspath("tests/test_data/LRG_293.xml"))
+    tree_LRG_293 = ET.parse(os.path.abspath("test_data/LRG_293.xml"))
     root_LRG_293 = tree_LRG_293.getroot()
     LRG_ID_293 = "LRG_293"
     LRG_293_t1 = "t1" #Valid transcript for LRG_293
@@ -68,7 +90,7 @@ def test_getLrgExons():
 
     #LRG_5 variables
     #LRG_5 has t1, t2 and t3. t3 was added after LRG_5 was made public. Strand = -1.
-    tree_LRG_5 = ET.parse(os.path.abspath("tests/test_data/LRG_5.xml"))
+    tree_LRG_5 = ET.parse(os.path.abspath("test_data/LRG_5.xml"))
     root_LRG_5 = tree_LRG_5.getroot()
     LRG_ID_5 = "LRG_5"
     LRG_5_t1 = "t1" #Valid transcript
