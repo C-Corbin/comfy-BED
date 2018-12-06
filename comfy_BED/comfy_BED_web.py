@@ -169,11 +169,17 @@ def getLrgXml(lrg_id, lrg_status):
         xml_url = 'http://ftp.ebi.ac.uk/pub/databases/lrgex/{}.xml'.format(lrg_id)
     if lrg_status == 'pending':
         xml_url = 'http://ftp.ebi.ac.uk/pub/databases/lrgex/pending/{}.xml'.format(lrg_id)
+    logging.info('Pulling {} xml file from webservices {}'.format(lrg_id, xml_url))
+
     xml_response = requests.get(xml_url)
+    if xml_response.status_code != 200:
+        logging.error('Could not query the API, check your connection and try again.')
     assert xml_response.status_code == 200, 'Could not query the API, check your connection and try again.'
 
     # return response as string
     lrg_xml = xml_response.text
+    logging.info('Retrieved {} xml successfully'.format(lrg_id))
+    
     return(lrg_xml)
 
 
