@@ -15,43 +15,72 @@ def getLrgId(input_text):
     lrg_id: String. The LRG ID in the format LRG_<number>. If the 
       LRG ID can't be calculated from the input, an error will be thrown.
     '''
+    logging.info('Web query input: {}'.format(input_text))
+
     # if input is an lrg number, save the variable
     if input_text.startswith('LRG_'):
         lrg_id = input_text
 
     # if input isn't an lrg number, try to query by name to find lrg number
     else:
+        logging.info('Querying webservices to get LRG ID and check that it is valid')
+
+        # try to query by HGNC name
         try:
             name_query_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg?query=name:{}'.format(input_text)
             name_query_response = requests.get(name_query_url)
+
+            if name_query_response.status_code != 200:
+                logging.error('Could not query the API, check your connection and try again.')
             assert name_query_response.status_code == 200, 'Could not query the API, check your connection and try again.'
 
             # loop through the response xml
             root = ET.fromstring(name_query_response.text)
             for child in root.iter('hitCount'):
                 # check that there is exactly 1 entry returned
+                if child.text == '1':
+                    pass
+                elif child.text == '0':
+                    logging.error('There were no hits for {}, check the input'.format(input_text))
+                else:
+                    logging.error('Expected one hit but there were multiple, check the input')
                 assert child.text == '1'
             # if so, extract the lrg id and save as a variable
             for child in root.iter('entry'):
                 lrg_id = child.get('id')
+                logging.info('Found LRG ID for {}: {}'.format(input_text, lrg_id))
 
+
+        # try to query by other references
         except AssertionError:
             name_query_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg?query={}'.format(input_text)
             name_query_response = requests.get(name_query_url)
+                
+            if name_query_response.status_code != 200:
+                logging.error('Could not query the API, check your connection and try again.')
             assert name_query_response.status_code == 200, 'Could not query the API, check your connection and try again.'
 
             # loop through the response xml
             root = ET.fromstring(name_query_response.text)
             for child in root.iter('hitCount'):
                 # check that there is exactly 1 entry returned
+                if child.text == '1':
+                    pass
+                elif child.text == '0':
+                    logging.error('There were no hits for {}, check the input'.format(input_text))
+                else:
+                    logging.error('Expected one hit but there were multiple, check the input')
                 assert child.text == '1'
             # if so, extract the lrg id and save as a variable
             for child in root.iter('entry'):
                 lrg_id = child.get('id')
-                
+                logging.info('Found LRG ID for {}: {}'.format(input_text, lrg_id))
+
+        # throw error if both queries fail
         except:
+            logging.error('Cannot find the LRG file from the given input.')
             raise ValueError('Cannot find the LRG file from the given input.')
-    
+
     return(lrg_id)
 
 
