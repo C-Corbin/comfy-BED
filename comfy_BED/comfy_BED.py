@@ -86,6 +86,11 @@ def setUpLogs(args, now):
 
 
 def checkValidTranscripts(args, root):
+    '''
+    Checks that user-entered transcripts are available in the LRG file
+    Input: LRG file 'root' (made with ElementTree) and command-line 'args'
+    Output: log/error messages, cancels program if transcript is invalid
+    '''
     input_transcript_list = args.transcripts.split(",")
     for input_transcript in input_transcript_list: #this is splitting it into letters!!
         lrg_transcript_list = []
@@ -239,7 +244,6 @@ def main():
         logging.info("LRG_ID: " + lrg_id)
 
     #check whether this LRG ID is public or pending *as of the time of running*, throw warning if pending
-    #note that a user-provided LRG could be downloaded while pending, then checked later in time when public
     publicOrPrivate, publicOrPrivateMessage = checkCurrentLrgStatus(lrg_id)
     #check whether the transcript is valid, and cancel everything if it isn't
     checkValidTranscripts(args, root)
