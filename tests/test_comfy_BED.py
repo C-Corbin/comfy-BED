@@ -2,7 +2,7 @@ import pytest
 import os
 import xml.etree.ElementTree as ET
 
-from comfy_BED.comfy_BED.comfy_BED import checkValidTranscripts, calculateGenomicPositions, getLrgExons
+from comfy_BED.comfy_BED import checkValidTranscripts, calculateGenomicPositions, getLrgExons
 
 '''
 def test_get_args(self):
@@ -11,9 +11,10 @@ def test_get_args(self):
     assert args.path.endswith('.xml'), 'The input file is not an xml file.'
 '''
 
+
 def test_checkValidTranscripts():
     # Setup - make a root xml tree for each test set
-    # Setup - need mock arg.transcripts
+    # Setup - need arg transcripts which have been split on comma
     # 5' 3' public
     tree_LRG_5 = ET.parse(os.path.abspath("test_data/LRG_5.xml"))
     root_LRG_5 = tree_LRG_5.getroot()
@@ -26,12 +27,19 @@ def test_checkValidTranscripts():
     tree_LRG_9 = ET.parse(os.path.abspath("test_data/LRG_9.xml"))
     root_LRG_9 = tree_LRG_9.getroot()
 
-    common_transcript = "t1"
-    common_transcript_list = "t1,t2"
-    rarer_transcript = "t4"
-    invalid_transcript = "t5"
+    common_transcript = ["t1"]
+    common_transcript_list = ["t1","t2"]
+    rarer_transcript = ["t4"]
+    invalid_transcript = ["whatevs"]
 
-    assert checkValidTranscripts(common_transcript, root_LRG_5) == True, "LRG_5 transcript 1 wrongly marked as invalid"
+    #act and assert
+    with pytest.raises(ValueError):
+        checkValidTranscripts(invalid_transcript, root_LRG_5)
+
+    with pytest.raises(ValueError):
+        checkValidTranscripts(invalid_transcript, root_LRG_5)
+
+test_checkValidTranscripts()
 
 
 def test_getGenomeMapping():
