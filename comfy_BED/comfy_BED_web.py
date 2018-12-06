@@ -15,43 +15,72 @@ def getLrgId(input_text):
     lrg_id: String. The LRG ID in the format LRG_<number>. If the 
       LRG ID can't be calculated from the input, an error will be thrown.
     '''
+    logging.info('Web query input: {}'.format(input_text))
+
     # if input is an lrg number, save the variable
     if input_text.startswith('LRG_'):
         lrg_id = input_text
 
     # if input isn't an lrg number, try to query by name to find lrg number
     else:
+        logging.info('Querying webservices to get LRG ID and check that it is valid')
+
+        # try to query by HGNC name
         try:
             name_query_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg?query=name:{}'.format(input_text)
             name_query_response = requests.get(name_query_url)
+
+            if name_query_response.status_code != 200:
+                logging.error('Could not query the API, check your connection and try again.')
             assert name_query_response.status_code == 200, 'Could not query the API, check your connection and try again.'
 
             # loop through the response xml
             root = ET.fromstring(name_query_response.text)
             for child in root.iter('hitCount'):
                 # check that there is exactly 1 entry returned
+                if child.text == '1':
+                    pass
+                elif child.text == '0':
+                    logging.error('There were no hits for {}, check the input'.format(input_text))
+                else:
+                    logging.error('Expected one hit but there were multiple, check the input')
                 assert child.text == '1'
             # if so, extract the lrg id and save as a variable
             for child in root.iter('entry'):
                 lrg_id = child.get('id')
+                logging.info('Found LRG ID for {}: {}'.format(input_text, lrg_id))
 
+
+        # try to query by other references
         except AssertionError:
             name_query_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg?query={}'.format(input_text)
             name_query_response = requests.get(name_query_url)
+                
+            if name_query_response.status_code != 200:
+                logging.error('Could not query the API, check your connection and try again.')
             assert name_query_response.status_code == 200, 'Could not query the API, check your connection and try again.'
 
             # loop through the response xml
             root = ET.fromstring(name_query_response.text)
             for child in root.iter('hitCount'):
                 # check that there is exactly 1 entry returned
+                if child.text == '1':
+                    pass
+                elif child.text == '0':
+                    logging.error('There were no hits for {}, check the input'.format(input_text))
+                else:
+                    logging.error('Expected one hit but there were multiple, check the input')
                 assert child.text == '1'
             # if so, extract the lrg id and save as a variable
             for child in root.iter('entry'):
                 lrg_id = child.get('id')
-                
+                logging.info('Found LRG ID for {}: {}'.format(input_text, lrg_id))
+
+        # throw error if both queries fail
         except:
+            logging.error('Cannot find the LRG file from the given input.')
             raise ValueError('Cannot find the LRG file from the given input.')
-    
+
     return(lrg_id)
 
 
@@ -68,17 +97,25 @@ def checkLrgExists(lrg_id):
     the function will return as true, since the LRG ID can be found 
     through the API and therefore it exists.
     '''
+    logging.info('Checking that LRG ID is valid...')
+
     # query api, returns xml that says whether lrg exists or not
     lrg_query_url = 'https://www.ebi.ac.uk/ebisearch/ws/rest/lrg?query={}'.format(lrg_id)
     lrg_query_response = requests.get(lrg_query_url)
+
+    if lrg_query_response.status_code != 200:
+        logging.error('Could not query the API, check your connection and try again.')
     assert lrg_query_response.status_code == 200, 'Could not query the API, check your connection and try again.'
 
     # parse the section that says if lrg exists or not, throw assertion error if it doesn't
     root = ET.fromstring(lrg_query_response.text)
     for child in root.iter('hitCount'):
+        if child.text != '1':
+            logging.error('LRG does not exist')
         assert child.text == '1', 'LRG does not exist'
     
     # if no assertion error is thrown, return true
+    logging.info('LRG ID is valid')
     return True
 
 
@@ -132,11 +169,17 @@ def getLrgXml(lrg_id, lrg_status):
         xml_url = 'http://ftp.ebi.ac.uk/pub/databases/lrgex/{}.xml'.format(lrg_id)
     if lrg_status == 'pending':
         xml_url = 'http://ftp.ebi.ac.uk/pub/databases/lrgex/pending/{}.xml'.format(lrg_id)
+    logging.info('Pulling {} xml file from webservices {}'.format(lrg_id, xml_url))
+
     xml_response = requests.get(xml_url)
+    if xml_response.status_code != 200:
+        logging.error('Could not query the API, check your connection and try again.')
     assert xml_response.status_code == 200, 'Could not query the API, check your connection and try again.'
 
     # return response as string
     lrg_xml = xml_response.text
+    logging.info('Retrieved {} xml successfully'.format(lrg_id))
+    
     return(lrg_xml)
 
 

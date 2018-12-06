@@ -30,8 +30,8 @@ def getArgs():
           Pulls LRG_1 from the web and outputs a BED file of transcript 1 in GRCh37
         
         python comfy_BED.py -l ~/Documents/LRG_1.xml -t t1,t2 -g GRCh38
-          Loads a local copy of LRG_1 from the web and outputs a BED file oin GRCh38 
-          for each of transcript 1 and transcript 2
+          Loads a local copy of LRG_1 and outputs a BED file in GRCh38 for each of 
+          transcript 1 and transcript 2
         '''
     ))
 
