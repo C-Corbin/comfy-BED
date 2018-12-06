@@ -7,7 +7,7 @@ import datetime
 import six
 import logging
 import requests
-import json
+import sys
 
 from comfy_BED_web import checkCurrentLrgStatus, getLrgFromWeb
 
@@ -83,6 +83,22 @@ def setUpLogs(args, now):
     '''
     log_filename = now.strftime("%Y-%m-%d") + "_comfy_BED" + ".log"
     logging.basicConfig(filename=log_filename, level=logging.DEBUG)
+
+
+def checkValidTranscripts(args, root):
+    input_transcript_list = args.transcripts.split(",")
+    for input_transcript in input_transcript_list: #this is splitting it into letters!!
+        lrg_transcript_list = []
+        for lrg_transcript in root.iter('transcript'):
+            lrg_transcript_list.append(str(lrg_transcript.get('name')))
+        if str(input_transcript) not in lrg_transcript_list:
+            logging.error("This transcript name is not valid: " + str(input_transcript))
+            logging.error("Valid transcript names are:")
+            for i in lrg_transcript_list:
+                if i != "None":
+                    logging.info(str(i))
+            logging.info("Cancelling comfy_BED")
+            sys.exit("Cancelling comfy_BED")
 
 
 def getLrgExons(transcript, lrg_id):
@@ -177,7 +193,7 @@ def calculateGenomicPositions(transcript_dict, chrom, gen_start, gen_end, strand
 
 def writeToFile(lrg_status, lrg_status_message, data_list, file_name, now):
     '''
-    Take a list of tuples and look through and write as a tab seperated file
+    Take a list of tuples and look through and write as a tab separated file
     '''
     with open(file_name, 'wb') as out:
         out.writelines('#BED file generated at: ' + now.strftime("%Y-%m-%d %H:%M") + '\n')
@@ -225,7 +241,8 @@ def main():
     #check whether this LRG ID is public or pending *as of the time of running*, throw warning if pending
     #note that a user-provided LRG could be downloaded while pending, then checked later in time when public
     publicOrPrivate, publicOrPrivateMessage = checkCurrentLrgStatus(lrg_id)
-
+    #check whether the transcript is valid, and cancel everything if it isn't
+    checkValidTranscripts(args, root)
     # extract chr, start, end, strand from mapping region of xml
     logging.info("Genome build: " + str(args.genome_build))
     chrom, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
