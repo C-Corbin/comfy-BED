@@ -2,7 +2,7 @@ import pytest
 import os
 import xml.etree.ElementTree as ET
 
-from comfy_BED.comfy_BED import getGenomeMapping, calculateGenomicPositions, getLrgExons
+from comfy_BED.comfy_BED.comfy_BED  import calculateGenomicPositions, checkValidTranscripts, getLrgExons, getGenomeMapping
 
 '''
 def test_get_args(self):
@@ -10,6 +10,51 @@ def test_get_args(self):
     assert os.path.isfile(args.path), 'The input is not a file.'
     assert args.path.endswith('.xml'), 'The input file is not an xml file.'
 '''
+
+
+def test_checkValidTranscripts():
+    # Setup - make a root xml tree for each test set
+    # Setup - need arg transcripts which have been split on comma
+    # -1 strand, public
+    tree_LRG_5 = ET.parse(os.path.abspath("tests/test_data/LRG_5.xml"))
+    root_LRG_5 = tree_LRG_5.getroot()
+
+    # 1 strand, pending
+    tree_LRG_9 = ET.parse(os.path.abspath("tests/test_data/LRG_9.xml"))
+    root_LRG_9 = tree_LRG_9.getroot()
+
+    # 1 strand, public
+    tree_LRG_293 = ET.parse(os.path.abspath("tests/test_data/LRG_293.xml"))
+    root_LRG_293 = tree_LRG_293.getroot()
+
+    #Some transcripts
+    common_transcript = ["t1"]
+    common_transcript_list = ["t1","t2"]
+    rarer_transcript = ["t4"]
+    invalid_transcript = ["errortime"]
+
+    #act and assert
+    #LRG_5
+    with pytest.raises(ValueError):
+        checkValidTranscripts(invalid_transcript, root_LRG_5)
+    with pytest.raises(ValueError):
+        checkValidTranscripts(rarer_transcript, root_LRG_5)
+    assert checkValidTranscripts(common_transcript, root_LRG_5) == (None), "LRG_5 t1 is returning something other than (None)"
+    assert checkValidTranscripts(common_transcript_list, root_LRG_5) == (None), "LRG_5 [t1,t2] is returning something other than (None)"
+
+    #LRG_9
+    with pytest.raises(ValueError):
+        checkValidTranscripts(invalid_transcript, root_LRG_9)
+    with pytest.raises(ValueError):
+        checkValidTranscripts(rarer_transcript, root_LRG_9)
+    assert checkValidTranscripts(common_transcript, root_LRG_9) == (None), "LRG_9 t1 is returning something other than (None)"
+
+    #LRG_293
+    with pytest.raises(ValueError):
+        checkValidTranscripts(invalid_transcript, root_LRG_293)
+    with pytest.raises(ValueError):
+        checkValidTranscripts(rarer_transcript, root_LRG_293)
+    assert checkValidTranscripts(common_transcript, root_LRG_293) == (None), "LRG_293 t1 is returning something other than (None)"
 
 
 def test_getGenomeMapping():

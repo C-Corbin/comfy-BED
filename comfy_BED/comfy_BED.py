@@ -4,13 +4,11 @@ import os
 import csv
 import xml.etree.ElementTree as ET
 import datetime
-import six
+import sixelect run
 import logging
-import requests
 import sys
 
 from comfy_BED_web import checkCurrentLrgStatus, getLrgFromWeb
-
 
 # load arguments
 def getArgs():
@@ -85,14 +83,13 @@ def setUpLogs(args, now):
     logging.basicConfig(filename=log_filename, level=logging.DEBUG)
 
 
-def checkValidTranscripts(args, root):
+def checkValidTranscripts(input_transcript_list, root):
     '''
     Checks that user-entered transcripts are available in the LRG file
     Input: LRG file 'root' (made with ElementTree) and command-line 'args'
     Output: log/error messages, cancels program if transcript is invalid
     '''
-    input_transcript_list = args.transcripts.split(",")
-    for input_transcript in input_transcript_list: #this is splitting it into letters!!
+    for input_transcript in input_transcript_list:
         lrg_transcript_list = []
         for lrg_transcript in root.iter('transcript'):
             lrg_transcript_list.append(str(lrg_transcript.get('name')))
@@ -103,7 +100,7 @@ def checkValidTranscripts(args, root):
                 if i != "None":
                     logging.info(str(i))
             logging.info("Cancelling comfy_BED")
-            sys.exit("Cancelling comfy_BED")
+            raise ValueError("Invalid transcript name")
 
 
 def getLrgExons(transcript, lrg_id):
@@ -246,7 +243,9 @@ def main():
     #check whether this LRG ID is public or pending *as of the time of running*, throw warning if pending
     publicOrPrivate, publicOrPrivateMessage = checkCurrentLrgStatus(lrg_id)
     #check whether the transcript is valid, and cancel everything if it isn't
-    checkValidTranscripts(args, root)
+    input_transcript_list = args.transcripts.split(",")
+    print input_transcript_list
+    checkValidTranscripts(input_transcript_list, root)
     # extract chr, start, end, strand from mapping region of xml
     logging.info("Genome build: " + str(args.genome_build))
     chrom, genome_start, genome_end, genome_strand = getGenomeMapping(root, args.genome_build)
