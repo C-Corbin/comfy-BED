@@ -4,7 +4,7 @@ import os
 import csv
 import xml.etree.ElementTree as ET
 import datetime
-import sixelect run
+import six
 import logging
 import sys
 
@@ -244,7 +244,6 @@ def main():
     publicOrPrivate, publicOrPrivateMessage = checkCurrentLrgStatus(lrg_id)
     #check whether the transcript is valid, and cancel everything if it isn't
     input_transcript_list = args.transcripts.split(",")
-    print input_transcript_list
     checkValidTranscripts(input_transcript_list, root)
     # extract chr, start, end, strand from mapping region of xml
     logging.info("Genome build: " + str(args.genome_build))
