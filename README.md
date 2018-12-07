@@ -1,6 +1,10 @@
 # comfy_BED
-Code to produce BED files from LRG files.
+A program to produce BED files from LRG files. 
 
+
+## Usage
+comfy_BED is designed to be integrated into bioinformatics pipelines. It runs from the command line.
+The user can either provide a local copy of a LRG file (offline mode), or have the LRG XML file fetched from the LRG website by its LRG ID (online mode). The user specifies a transcript (e.g. t1, t2) and genome build (GRCh37 or GRCh38)
 
 ## Setup
 
