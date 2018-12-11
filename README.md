@@ -1,6 +1,6 @@
 # comfy_BED
 
-comfy_BED is a program which produces BED files from LRG files. comfy_BED is designed to be integrated into bioinformatics pipelines. It runs from the command line.
+comfy_BED is a program which produces BED files from LRG files. comfy_BED is designed to be integrated into bioinformatics pipelines. It runs from the command line.  
 To run comfy_BED, the user can either provide a local copy of a LRG file (offline mode), or have the LRG XML file fetched from the LRG website by its LRG ID (online mode). The user specifies a transcript (e.g. t1, t2) and genome build (GRCh37 or GRCh38). comfy_BED makes a BED file, and appends run information to a daily log file.
 
 
@@ -35,11 +35,11 @@ comfy_BED has been designed to work with Python 2 only
 
 ## Flags
 
-`-w` **OR** `-l`: Run comfy_BED in 'web' (-w) or 'local' (-l) mode. **Required** (only one of these options is required).
+`-w` **OR** `-l`: Run comfy_BED in 'web' (-w) or 'local' (-l) mode. **Required** (only one of these options is required):
 - Web mode `-w`: Pulls LRG data from the web. Provide an LRG ID, HGNS gene name or RefSeq/Ensembl ID. 
 - Local mode `-l`: Loads LRG data from a local file. Provide a filepath to an LRG XML file.  
 
-`-t`: Choice of transcript(s) to make BED file for. **Required**. Must match the transcript ID in the LRG, e.g. t1. Multiple transcripts can be processed by seperating each trasncript with a comma (no spaces), e.g. t1,t2.  
+`-t`: Choice of transcript(s) to make BED file for. **Required**. Must match the transcript ID in the LRG, e.g. t1. Multiple transcripts can be processed by separating each transcript with a comma (no spaces), e.g. t1,t2.  
 
 `-g`: Genome build option, either GRCh37 or GRCh38. **Optional**, defaults to GRCh37 if empty.  
 
