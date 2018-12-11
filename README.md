@@ -1,10 +1,11 @@
 # comfy_BED
 
 comfy_BED is a program which produces BED files from LRG files. comfy_BED is designed to be integrated into bioinformatics pipelines. It runs from the command line.  
+
 To run comfy_BED, the user can either provide a local copy of a LRG file (offline mode), or have the LRG XML file fetched from the LRG website by its LRG ID (online mode). The user specifies a transcript (e.g. t1, t2) and genome build (GRCh37 or GRCh38). comfy_BED makes a BED file, and appends run information to a daily log file.
 
 
-## Setup
+## comfy_BED setup
 
 ### Download code
 
@@ -33,7 +34,11 @@ comfy_BED has been designed to work with Python 2 only
 - To exit virtual environment: `deactivate`
 
 
-## Flags
+## Running comfy_BED
+
+### Flags
+
+`-h`: Show help text and exit
 
 `-w` **OR** `-l`: Run comfy_BED in 'web' (-w) or 'local' (-l) mode. **Required** (only one of these options is required):
 - Web mode `-w`: Pulls LRG data from the web. Provide an LRG ID, HGNS gene name or RefSeq/Ensembl ID. 
@@ -43,11 +48,24 @@ comfy_BED has been designed to work with Python 2 only
 
 `-g`: Genome build option, either GRCh37 or GRCh38. **Optional**, defaults to GRCh37 if empty.  
 
-
-## Usage examples
+### Usage examples
 
 `python comfy_BED.py -w LRG_1 -t t1 -g GRCh37`  
 Pulls LRG_1 from the web and outputs a BED file of transcript 1 in GRCh37
         
 `python comfy_BED.py -l ~/Documents/LRG_1.xml -t t1,t2 -g GRCh38`  
 Loads a local copy of LRG_1 and outputs a BED file in GRCh38 for each of transcript 1 and transcript 2
+
+### Output
+
+comfy_BED will output a BED file of the genomic co-ordinates of the LRG transcript selected. The output is in the standard BED format, with the exon number also included in the 4th column.  
+
+The file will be named `<LRG_ID>_<transcript_ID>.bed`, where `LRG_ID` is the LRG number and `<transcript_ID>` is the transcript number, e.g. LRG_1_t1.bed.  
+
+**Warning**: If the script is run when there is already a file of the same name in the directory, the old file will be overwritten.
+
+### Logging
+
+comfy_BED automatically produces a log file detailing the steps that it has carried out. This is useful if you require an audit trail in the case of an error, or to verify that comfy_BED has performed as expected.
+
+The log file will be saved in the current directory with the name `<date>_comfy_BED.log`, where `<date>` is the current date. If comfy_BED is run multiple times in the same day, the logs from each run will be appended onto the same log file.
