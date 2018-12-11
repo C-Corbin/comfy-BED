@@ -12,7 +12,7 @@ To run comfy_BED, the user can either provide a local copy of a LRG file (offlin
 
 ### Set up either a conda or virtual environment:
 
-comfy_BED has been designed to work with both Python 2 and Python 3
+comfy_BED has been designed to work with Python 2 only
 
 #### Conda environment
 
@@ -24,7 +24,7 @@ comfy_BED has been designed to work with both Python 2 and Python 3
 
 #### Virtual environment
 
-- Set up virtual env with python2 as Python interpreter: `virtualenv comfy-env`
+- Set up virtual env with python2 as Python interpreter: `virtualenv --python=/usr/bin/python2.7 comfy-env`
 
 - Activate the virtual environment: `source comfy-env/bin/activate`
 
@@ -35,16 +35,19 @@ comfy_BED has been designed to work with both Python 2 and Python 3
 
 ## Flags
 
--w OR -l: run comfy_BED in 'web' (-w) or 'local' (-l) mode. Provide an LRG ID for web mode. Provide a filepath for local mode.
--t: transcript option, e.g. t1.
--g: genome option, either GRCh37 or GRCh38.
+`-w` **OR** `-l`: Run comfy_BED in 'web' (-w) or 'local' (-l) mode. **Required** (only one of these options is required).
+- Web mode `-w`: Pulls LRG data from the web. Provide an LRG ID, HGNS gene name or RefSeq/Ensembl ID. 
+- Local mode `-l`: Loads LRG data from a local file. Provide a filepath to an LRG XML file.  
+
+`-t`: Choice of transcript(s) to make BED file for. **Required**. Must match the transcript ID in the LRG, e.g. t1. Multiple transcripts can be processed by seperating each trasncript with a comma (no spaces), e.g. t1,t2.  
+
+`-g`: Genome build option, either GRCh37 or GRCh38. **Optional**, defaults to GRCh37 if empty.  
 
 
 ## Usage examples
 
-python comfy_BED.py -w LRG_1 -t t1 -g GRCh37
-          Pulls LRG_1 from the web and outputs a BED file of transcript 1 in GRCh37
+`python comfy_BED.py -w LRG_1 -t t1 -g GRCh37`  
+Pulls LRG_1 from the web and outputs a BED file of transcript 1 in GRCh37
         
-python comfy_BED.py -l ~/Documents/LRG_1.xml -t t1,t2 -g GRCh38
-          Loads a local copy of LRG_1 and outputs a BED file in GRCh38 for each of 
-          transcript 1 and transcript 2
+`python comfy_BED.py -l ~/Documents/LRG_1.xml -t t1,t2 -g GRCh38`  
+Loads a local copy of LRG_1 and outputs a BED file in GRCh38 for each of transcript 1 and transcript 2
