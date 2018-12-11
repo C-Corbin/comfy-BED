@@ -69,3 +69,7 @@ The file will be named `<LRG_ID>_<transcript_ID>.bed`, where `LRG_ID` is the LRG
 comfy_BED automatically produces a log file detailing the steps that it has carried out. This is useful if you require an audit trail in the case of an error, or to verify that comfy_BED has performed as expected.
 
 The log file will be saved in the current directory with the name `<date>_comfy_BED.log`, where `<date>` is the current date. If comfy_BED is run multiple times in the same day, the logs from each run will be appended onto the same log file.
+
+### Testing
+
+comfy_BED is unit tested using the pytest package. To run the tests, navigate to the comfy_BED directory and run `pytest`.
