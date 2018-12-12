@@ -41,7 +41,7 @@ comfy_BED has been designed to work with Python 2 only
 `-h`: Show help text and exit
 
 `-w` **OR** `-l`: Run comfy_BED in 'web' (-w) or 'local' (-l) mode. **Required** (only one of these options is required):
-- Web mode `-w`: Pulls LRG data from the web. Provide an LRG ID, HGNS gene name or RefSeq/Ensembl ID. 
+- Web mode `-w`: Pulls LRG data from the web. Provide an LRG ID, HGNC gene name or RefSeq/Ensembl ID. 
 - Local mode `-l`: Loads LRG data from a local file. Provide a filepath to an LRG XML file.  
 
 `-t`: Choice of transcript(s) to make BED file for. **Required**. Must match the transcript ID in the LRG, e.g. t1. Multiple transcripts can be processed by separating each transcript with a comma (no spaces), e.g. t1,t2.  
@@ -60,7 +60,7 @@ Loads a local copy of LRG_1 and outputs a BED file in GRCh38 for each of transcr
 
 comfy_BED will output a BED file of the genomic co-ordinates of the LRG transcript selected. The output is in the standard BED format, with the exon number also included in the 4th column.  
 
-The file will be named `<LRG_ID>_<transcript_ID>.bed`, where `LRG_ID` is the LRG number and `<transcript_ID>` is the transcript number, e.g. LRG_1_t1.bed.  
+The file will be named `<LRG_ID>_<transcript_ID>.bed`, where `<LRG_ID>` is the LRG number and `<transcript_ID>` is the transcript number, e.g. LRG_1_t1.bed.  
 
 **Warning**: If the script is run when there is already a file of the same name in the directory, the old file will be overwritten.
 
